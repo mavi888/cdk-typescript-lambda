@@ -1,16 +1,41 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib';
+
+import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import {Function, Runtime, Code, FunctionUrlAuthType } from "aws-cdk-lib/aws-lambda";
 
 export class CdkTypescriptStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    //Dynamodb table definition
+    const table = new Table(this, "Hello", {
+      partitionKey: { name: "name", type: AttributeType.STRING },
+    });
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'CdkTypescriptQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    // lambda function
+    const dynamoLambda = new Function(this, "DynamoLambdaHandler", {
+      runtime: Runtime.NODEJS_12_X,
+      code: Code.fromAsset("functions"),
+      handler: "function.handler",
+      environment: {
+        HELLO_TABLE_NAME: table.tableName,
+      },
+    });
+
+    // permissions to lambda to dynamo table
+    table.grantReadWriteData(dynamoLambda);
+
+    const myFunctionUrl = dynamoLambda.addFunctionUrl({
+      authType: FunctionUrlAuthType.NONE,
+      cors: {
+        allowedOrigins: ['*'],
+      }
+    });
+
+    new CfnOutput(this, 'FunctionUrl', {
+      value: myFunctionUrl.url,
+    });
+
   }
 }
