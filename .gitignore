@@ -3,6 +3,7 @@
 *.d.ts
 node_modules
 package-lock.json
+.vscode
 
 # CDK asset staging directory
 .cdk.staging
