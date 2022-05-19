@@ -4,6 +4,7 @@
   "bin": {
     "cdk-typescript": "bin/cdk-typescript.js"
   },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

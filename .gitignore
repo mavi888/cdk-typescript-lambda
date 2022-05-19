@@ -1,8 +1,8 @@
 *.js
-!functions/*.js
 !jest.config.js
 *.d.ts
 node_modules
+package-lock.json
 
 # CDK asset staging directory
 .cdk.staging
